@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: platform-app-base
+  description: Golden path Kustomize base para serviços Node.js/Fastify — Deployment + Service + Ingress + TLS + HPA + PDB + ServiceMonitor + OTEL
+  annotations:
+    github.com/project-slug: TourinhoM/platform-app-base
+  tags:
+    - platform
+    - kustomize
+    - golden-path
+    - nodejs
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
