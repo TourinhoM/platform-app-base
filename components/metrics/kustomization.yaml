@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Fragment METRICS — ServiceMonitor (scrape do Prometheus em /metrics).
+# Default-on: o golden path injeta observabilidade; o app só expõe /metrics.
+# Aponta pra Service porta http — pareie com o fragment workload.
+resources:
+  - servicemonitor.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: app-config
+      fieldPath: data.name
+    targets:
+      - select:
+          kind: ServiceMonitor
+        fieldPaths:
+          - metadata.name
+          - spec.selector.matchLabels.[app.kubernetes.io/name]

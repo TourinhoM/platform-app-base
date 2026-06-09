@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Fragment HTTP — exposição externa: Ingress + Certificate. Opt-in: microserviço
+# interno (sem entrada HTTP) não inclui. Carrega os replacements de `name` (no
+# Ingress) e de `hostname` (Ingress + Certificate) — por isso o hostname não
+# fica órfão quando o serviço não expõe HTTP.
+resources:
+  - ingress.yaml
+  - certificate.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: app-config
+      fieldPath: data.name
+    targets:
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - metadata.name
+          - spec.rules.0.http.paths.0.backend.service.name
+  - source:
+      kind: ConfigMap
+      name: app-config
+      fieldPath: data.hostname
+    targets:
+      - select:
+          kind: Certificate
+        fieldPaths:
+          - spec.dnsNames.0
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - spec.rules.0.host
+          - spec.tls.0.hosts.0

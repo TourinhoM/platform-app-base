@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Overlay de teste (NÃO deployado) — simula um microserviço INTERNO: só
+# workload + metrics, sem http. Além de lintar o core, valida que ele
+# renderiza SEM o fragment http (pega acoplamento acidental de hostname).
+components:
+  - ../../components/workload
+  - ../../components/metrics
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - name=lint-internal
+
+images:
+  - name: app-image
+    newName: ghcr.io/tourinho-labs/lint-internal
+    newTag: latest

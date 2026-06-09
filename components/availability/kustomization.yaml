@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Fragment AVAILABILITY — HPA + PDB. Opt-in. O scaleTargetRef do HPA e o
+# selector do PDB casam com o Deployment porque ambos são reescritos pra
+# app-config.name (mesma fonte que o workload usa).
+resources:
+  - hpa.yaml
+  - pdb.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: app-config
+      fieldPath: data.name
+    targets:
+      - select:
+          kind: HorizontalPodAutoscaler
+        fieldPaths:
+          - metadata.name
+          - spec.scaleTargetRef.name
+      - select:
+          kind: PodDisruptionBudget
+        fieldPaths:
+          - metadata.name
+          - spec.selector.matchLabels.[app.kubernetes.io/name]

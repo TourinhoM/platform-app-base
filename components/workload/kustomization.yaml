@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Fragment WORKLOAD — o irredutível: todo microserviço tem Deployment + Service.
+# Sempre incluído. Carrega o replacement de `name` só dos recursos que define.
+resources:
+  - deployment.yaml
+  - service.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: app-config
+      fieldPath: data.name
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - metadata.name
+          - spec.selector.matchLabels.[app.kubernetes.io/name]
+          - spec.template.metadata.labels.[app.kubernetes.io/name]
+      - select:
+          kind: Service
+        fieldPaths:
+          - metadata.name
+          - spec.selector.[app.kubernetes.io/name]

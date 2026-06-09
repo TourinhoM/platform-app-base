@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Overlay de teste do bundle legado base/ (frozen). Existe pra (1) lintar o
+# legado enquanto ele estiver vivo e (2) manter o base/ fora do auto-discovery
+# (Component não builda standalone — sem este overlay referenciando-o, o
+# discovery o pegaria e o `kustomize build base/` falharia).
+# Removível no cutover, junto com base/, quando os fixtures forem aposentados.
+components:
+  - ../../base
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - name=lint-legacy
+      - hostname=lint-legacy.local
+
+images:
+  - name: app-image
+    newName: ghcr.io/tourinho-labs/lint-legacy
+    newTag: latest
