@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Size SMALL — resources do container. Pareia com size=small da AppNamespace
+# Claim (quota cpu1/1Gi). Default da golden path. A plataforma é dona dos
+# números; o dev só escolhe o tamanho (profile) no scaffolder.
+patches:
+  - target:
+      kind: Deployment
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

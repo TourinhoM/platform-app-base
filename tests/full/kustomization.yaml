@@ -1,10 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Overlay de teste (NÃO deployado) — composição completa: os 4 fragments.
-# Valida a app totalmente exposta (workload + http + availability + metrics).
+# Overlay de teste (NÃO deployado) — composição completa: os 4 fragments + um
+# size. Valida a app totalmente exposta e que o size patcha os resources.
 components:
   - ../../components/workload
+  - ../../components/size-medium
   - ../../components/http
   - ../../components/availability
   - ../../components/metrics
