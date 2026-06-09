@@ -1,0 +1,21 @@
+# Lint da estrutura do golden path. O app-base é um Component (não builda
+# standalone), então o lint-k8s renderiza o overlay tests/ (Component + valores
+# dummy) e roda kubeconform + kube-linter + polaris sobre o resultado.
+#
+# É AQUI que o lint de best-practices mora — uma vez, na fonte. Os repos
+# gitops-<app> que consomem este base não relintam: só carregam valores e
+# rodam um smoke de render (ci-gitops.yml).
+name: Lint
+
+on:
+  push:
+  schedule:
+    - cron: '0 8 * * 1'   # Segunda 08:00 UTC — pega drift do datreeio CRDs-catalog
+  workflow_dispatch:
+
+jobs:
+  lint:
+    permissions:
+      contents: read
+      security-events: write   # SARIF upload (kube-linter)
+    uses: TourinhoM/org-ci-platform/.github/workflows/lint-k8s.yml@main
