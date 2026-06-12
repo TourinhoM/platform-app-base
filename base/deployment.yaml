@@ -13,6 +13,11 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: app
+      annotations:
+        # Reloader: mudança em Secret/ConfigMap consumido (env.properties,
+        # capability nova entregando db-conn/cache-conn) rola o pod sozinho —
+        # sem bump manual de revisão nos templates day-2.
+        reloader.stakater.com/auto: "true"
     spec:
       securityContext:
         runAsNonRoot: true
@@ -49,6 +54,20 @@ spec:
                   fieldPath: metadata.namespace
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(POD_NAMESPACE)
+          # Ganchos SEMPRE presentes e inertes (optional: true): edição day-2
+          # nunca muda estrutura — env vira conteúdo de env.properties no
+          # gitops repo; capabilities entregam Secrets com nomes fixos do
+          # contrato (db-conn/cache-conn) que ligam sozinhos ao nascer.
+          envFrom:
+            - configMapRef:
+                name: app-env
+                optional: true
+            - secretRef:
+                name: db-conn
+                optional: true
+            - secretRef:
+                name: cache-conn
+                optional: true
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
